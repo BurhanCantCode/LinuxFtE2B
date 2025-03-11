@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Card, CardContent, CardHeader, CardFooter } from '@/components/ui/card';
 import { Circle, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import ReactMarkdown from 'react-markdown';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -73,10 +74,16 @@ export default function Chat({ terminalOutput }: ChatProps) {
       }
 
       // Prepare conversation history for the API
-      const conversationHistory = messages.map(msg => ({
-        role: msg.role,
-        content: msg.content,
-      }));
+      const conversationHistory = [
+        {
+          role: 'system',
+          content: 'You are an AI assistant specialized in helping with Ubuntu Linux terminal commands.',
+        },
+        ...messages.map(msg => ({
+          role: msg.role,
+          content: msg.content,
+        })),
+      ];
 
       // Add the new user message
       conversationHistory.push({
@@ -146,7 +153,11 @@ export default function Chat({ terminalOutput }: ChatProps) {
                 : 'ai-message bg-muted mr-auto'
             }`}
           >
-            {message.content}
+            {message.role === 'assistant' ? (
+              <ReactMarkdown>{message.content}</ReactMarkdown>
+            ) : (
+              message.content
+            )}
           </div>
         ))}
         {isLoading && (
